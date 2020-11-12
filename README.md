@@ -19,7 +19,6 @@ The requirements is inside the PDF.
 * Bootstrap 4
 * Log4j 1.2.17
 * MSSQL JDBC 8.2.0
-* Apache Commons Upload 
 * OAuth 2 by Google API
 
 keep-up-to-date 
