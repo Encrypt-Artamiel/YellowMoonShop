@@ -1,4 +1,4 @@
-# [LAB231]-[Lab Java Web]-[FPT University]-[(https://github.com/Encrypt-Artamiel/YellowMoonShop)]
+# [LAB231]-[Lab Java Web]-[FPT University]-[(https://github.com/longbnh/YellowMoonShop)]
 ### This repository stores resources regarding to Course Project Assignment using in LAB Java2EE class at Fall 2020, FPT University, HCMC Campus
 ## Yellow Moon Shop
 The requirements is inside the PDF.
