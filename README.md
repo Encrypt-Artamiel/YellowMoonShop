@@ -20,6 +20,7 @@ The requirements is inside the PDF.
 * Log4j 1.2.17
 * MSSQL JDBC 8.2.0
 * OAuth 2 by Google API
+* Integrated online payments via MoMo API
 
 keep-up-to-date 
 
