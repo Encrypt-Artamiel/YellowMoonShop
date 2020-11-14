@@ -126,7 +126,8 @@ public class UserAuthenticationFilter implements Filter {
                 rd.forward(request, response);
             }
         } catch (Throwable t) {
-            LOG.error("Throwable : " + t.getMessage());
+//            LOG.error("Throwable : " + t.getMessage());
+            t.printStackTrace();
         }        
     }
 

@@ -6,6 +6,8 @@
 package longbnh.servlet;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -25,6 +27,8 @@ import longbnh.orders.OrdersDAO;
 import longbnh.product.ProductDAO;
 import longbnh.product.ProductDTO;
 import longbnh.users.UsersDTO;
+import momo.MoMoRequestController;
+import momo.MoMoResponseObject;
 import org.apache.log4j.Logger;
 
 /**
@@ -51,8 +55,9 @@ public class CheckOutServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         ServletContext context = request.getServletContext();
-        Map<String, String> siteMap = (Map)context.getAttribute("MAP");
+        Map<String, String> siteMap = (Map) context.getAttribute("MAP");
         String url = siteMap.get("homePage");
+        boolean flag = false;
         try {
             String userID = null;
             float total;
@@ -94,30 +99,49 @@ public class CheckOutServlet extends HttpServlet {
 
                     orderDAO.getLastOrderID(total, currentDate, name, phone, address);
                     String orderID = orderDAO.getOrderID();
-                    request.setAttribute("ORDER_ID", orderID);
-                    request.setAttribute("TOTAL", cart.getTotal());
-                    OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
-                    
-                    for (Map.Entry<Integer, ProductDTO> entry : cakes.entrySet()) {
-                        Integer productID = entry.getKey();
-                        ProductDTO cake = entry.getValue();
+                    if (paymentID == 1) {
+                        request.setAttribute("ORDER_ID", orderID);
+                        request.setAttribute("TOTAL", cart.getTotal());
+                        OrderDetailDAO orderDetailDAO = new OrderDetailDAO();
 
-                        int quantity = cake.getQuantity();
-                        float totalPrice = cake.getPrice() * quantity;
-                        orderDetailDAO.addCakeToOrder(orderID, productID, quantity, totalPrice);
-                        productDAO.updateQuantityAfterOrder(productID, quantity);
+                        for (Map.Entry<Integer, ProductDTO> entry : cakes.entrySet()) {
+                            Integer productID = entry.getKey();
+                            ProductDTO cake = entry.getValue();
+
+                            int quantity = cake.getQuantity();
+                            float totalPrice = cake.getPrice() * quantity;
+                            orderDetailDAO.addCakeToOrder(orderID, productID, quantity, totalPrice);
+                            productDAO.updateQuantityAfterOrder(productID, quantity);
+                        }
+                        session.removeAttribute("CART");
+                    } else {
+                        MoMoResponseObject responseObject = MoMoRequestController.sendRequestToMoMo(orderID, (long) cart.getTotal());
+                        if (responseObject != null) {
+                            url = responseObject.getPayUrl();
+                            flag = true;
+                        }
                     }
-                    session.removeAttribute("CART");
-                    
                 }
             }
         } catch (NamingException ex) {
             LOG.error("NamingException : " + ex.getMessage());
         } catch (SQLException ex) {
             LOG.error("SQLException : " + ex.getMessage());
+        } catch (IOException ex) {
+            LOG.error("IOException : " + ex.getMessage());
+        } catch (InvalidKeyException ex) {
+            LOG.error("InvalidKeyException : " + ex.getMessage());
+        } catch (NoSuchAlgorithmException ex) {
+            LOG.error("NoSuchAlgorithmException : " + ex.getMessage());;
+        } catch (NumberFormatException ex) {
+            LOG.error("NumberFormatException : " + ex.getMessage());
         } finally {
-            RequestDispatcher rd = request.getRequestDispatcher(url);
-            rd.forward(request, response);
+            if (flag) {
+                response.sendRedirect(url);
+            } else {
+                RequestDispatcher rd = request.getRequestDispatcher(url);
+                rd.forward(request, response);
+            }
         }
     }
 

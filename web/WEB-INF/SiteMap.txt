@@ -16,3 +16,4 @@ updateCart=UpdateCartServlet
 checkOut=CheckOutServlet
 tracking=TrackingServlet
 google=LoginGoogleServlet
+momo=MoMoResponseServlet
